@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<sparkBeans>
+    <sparkBean>
+        <spark.tableId>resourceId</spark.tableId>
+        <spark.calc.handler.class>com.kongdg.spark.hanlder.SparkCalcHanlder</spark.calc.handler.class>
+    </sparkBean>
+    <sparkBean>
+        <spark.tableId>resourceId2</spark.tableId>
+        <spark.calc.handler.class>com.kongdg.spark.hanlder.SparkCalcHanlder</spark.calc.handler.class>
+    </sparkBean>
+</sparkBeans>
