@@ -1,0 +1,39 @@
+package com.kongdg.hadoop;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.serde2.SerDeException;
+import org.apache.orc.OrcFile;
+import org.apache.orc.RecordReader;
+import org.apache.orc.TypeDescription;
+import org.apache.orc.storage.ql.exec.vector.VectorizedRowBatch;
+
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * @author userkdg
+ * @date 2020-04-11 22:41
+ **/
+public class TestOrc {
+    public static void main(String[] args) throws IOException, SerDeException {
+//        为了满足hadoop在windows上有权限操作 winutils.exe 否则会导致写入文件等报权限不足
+        System.setProperty("hadoop.home.dir", "D:\\bigdata\\hadoop-2.7.2");
+        Path path = new Path("F:\\j_workspace\\hd-spark-scala\\src\\main\\resources\\orc\\part-00000-1d134c5f-a995-4e8a-83ae-b058785a9b64-c000.snappy.orc");
+        Configuration conf = new Configuration();
+        org.apache.orc.Reader reader = OrcFile.createReader(path,
+                OrcFile.readerOptions(conf));
+        RecordReader rows = reader.rows();
+        VectorizedRowBatch batch = reader.getSchema().createRowBatch();
+        long rowNumber = rows.getRowNumber();
+        System.out.println("文件行数：" + rowNumber);
+        List<String> fieldNames = reader.getSchema().getFieldNames();
+        List<TypeDescription> types = reader.getSchema().getChildren();
+        System.out.println("文件字段有：");
+        for (int i = 0; i < fieldNames.size(); i++) {
+            System.out.println(fieldNames.get(i) + "->" + types.get(i));
+        }
+        rows.close();
+    }
+
+}

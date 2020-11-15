@@ -1,0 +1,11 @@
+/.part-00000.crc
+/part-00000
+.idea
+logs
+metastore_db
+checkpoint-tmp
+checkpoint-tmp-streaming
+resources
+spark-warehouse
+target
+tmp
