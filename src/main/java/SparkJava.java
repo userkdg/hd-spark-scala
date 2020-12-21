@@ -1,14 +1,9 @@
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.input.PortableDataStream;
-import org.apache.spark.sql.*;
-import scala.Tuple2;
-import scala.collection.JavaConversions;
-import scala.collection.immutable.Seq;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 
-import java.io.DataInputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,24 +12,15 @@ import java.util.List;
  * @date 2019/7/25 23:48
  **/
 public class SparkJava {
+    static {
+        String checkPat = "D:\\bigdata\\hadoop-2.7.2";
+        System.setProperty("HADOOP_HOME", checkPat);
+        System.setProperty("hadoop.home.dir", checkPat);
+
+    }
+
     public static void main(String[] args) {
-        SparkConf conf = new SparkConf().setAppName("test spark job").setMaster("local[*]");
-        JavaSparkContext sc = new JavaSparkContext(conf);
-        sc.binaryFiles("/path/xx.gz", 1)
-                .zipWithIndex().map(new Function<Tuple2<Tuple2<String, PortableDataStream>, Long>, Object>() {
-            public Object call(Tuple2<Tuple2<String, PortableDataStream>, Long> v1) throws Exception {
-                Tuple2<String, PortableDataStream> dataStreamTuple2 = v1._1();
-                Long aLong = v1._2();
-                String path = dataStreamTuple2._1();
-                PortableDataStream portableDataStream = dataStreamTuple2._2();
-                DataInputStream open = portableDataStream.open();
-
-
-                return null;
-            }
-        }).cache();
-
-        SparkSession spark = SparkSession.builder().appName("my Spark Session").getOrCreate();
+        SparkSession spark = SparkSession.builder().master("local[1]").appName("my Spark Session").getOrCreate();
         // $example on:generic_load_save_functions$
         Dataset<Row> usersDF = spark.read().load("examples/src/main/resources/users.parquet");
         usersDF.select("name", "favorite_color").write().save("namesAndFavColors.parquet");
@@ -51,7 +37,7 @@ public class SparkJava {
                 .as(Encoders.STRING());
         peopleDF.toJavaRDD().mapPartitions(new FlatMapFunction<Iterator<Row>, Iterator<List<String>>>() {
             public Iterator<Iterator<List<String>>> call(Iterator<Row> rowIterator) throws Exception {
-                while (rowIterator.hasNext()){
+                while (rowIterator.hasNext()) {
                     Row next = rowIterator.next();
                     int size = next.size();
                     for (int i = 0; i < size; i++) {
